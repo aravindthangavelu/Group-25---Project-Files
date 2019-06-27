@@ -1,0 +1,31 @@
+# Hierarchical Clustering Using Python
+
+# Importing the data (Main Dataset Splitted With Only 150 Data Points Selected In Random)
+data = read.csv('data_Age_Economy_Level.csv')
+
+
+# By Using Dendogram the optimal number of clusters can be visualized 
+dendrogram = Agelust(d = dist(data, method = 'euclidean'), method = 'ward.D')
+#plot function used to plot 
+plot(dendrogram,
+     main = paste('Dendrogram'),
+     xlab = 'Age Group',
+     ylab = 'Euclidean distances')
+
+# Fitting The Clusters into data Using The Euclidean Method
+Age = hclust(d = dist(data, method = 'euclidean'), method = 'ward.D')
+data_economy_Level = cutree(Age, 5)
+
+# Data Visualization Of the Clusters With Each Color Representing Each Group
+library(cluster)
+clusplot(data,
+         data_economy_Level,
+         lines = 0,
+         shade = TRUE,
+         color = TRUE,
+         labels= 0,
+         plotchar = FALSE,
+         span = TRUE,
+         main = paste('Clustering of Age and Economy Level'),
+         xlab = 'Age',
+         ylab = 'Economy Level')

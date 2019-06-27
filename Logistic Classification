@@ -1,0 +1,74 @@
+# Logistic Regression Using Python
+# Importing the libraries Required
+import numpy as npy
+import matplotlib.pyplot as plotter
+import pandas as pan
+
+# Importing the data
+data = pan.read_csv('Data_Preprocessed.csv')
+X = data.iloc[:, [2, 4]].values
+y = data.iloc[:, 7].values
+
+from sklearn.preprocessing import LabelEncoder,OneHotEncoder
+label_encoder_varaible_1=LabelEncoder()
+X[:,1]=label_encoder_varaible_1.fit_transform(X[:,1])
+label_encoder_varaible_2=LabelEncoder()
+y=label_encoder_varaible_2.fit_transform(y)
+
+# Splitting the data into the Training set and Test set
+from sklearn.model_selection import train_test_split
+X_Training_Set, X_Testing_Seting_Set, Y_Training_Set, Y_Testing_Seting_Set = train_test_split(X, y, test_size = 0.25, random_state = 0)
+
+# Feature Scaling the values for the plot so that they have same set of values
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_Training_Set = sc.fit_transform(X_Training_Set)
+X_Testing_Seting_Set = sc.transform(X_Testing_Seting_Set)
+
+# Fitting Logistic Regression to the Training set
+from sklearn.linear_model import LogisticRegression
+modelClassifier = LogisticRegression(random_state = 0)
+modelClassifier.fit(X_Training_Set, Y_Training_Set)
+
+# Predicting the Test set results
+Predictor = modelClassifier.predict(X_Testing_Seting_Set)
+
+# Building the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(Y_Testing_Seting_Set, Predictor)
+
+# Visualising the Training set results
+from matplotlib.colors import ListedColormap
+Age_Map_Points, y_set = X_Training_Set, Y_Training_Set
+X1, X2 = npy.meshgrid(npy.arange(start = Age_Map_Points[:, 0].min() - 1, stop = Age_Map_Points[:, 0].max() + 1, step = 0.01),
+                     npy.arange(start = Age_Map_Points[:, 1].min() - 1, stop = Age_Map_Points[:, 1].max() + 1, step = 0.01))
+plotter.contourf(X1, X2, modelClassifier.predict(npy.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape),
+             alpha = 0.75, cmap = ListedColormap(('red', 'green')))
+plotter.xlim(X1.min(), X1.max())
+plotter.ylim(X2.min(), X2.max())
+for i, j in enumerate(npy.unique(y_set)):
+    plotter.scatter(Age_Map_Points[y_set == j, 0], Age_Map_Points[y_set == j, 1],
+                c = ListedColormap(('red', 'green'))(i), label = j)
+plotter.title('Logistic Regression (Training set)')
+plotter.xlabel('Age')
+plotter.ylabel('Educational Level')
+plotter.legend()
+plotter.show()
+
+# Visualising the Test set results
+from matplotlib.colors import ListedColormap
+Age_Map_Points, y_set = X_Testing_Seting_Set, Y_Testing_Seting_Set
+X1, X2 = npy.meshgrid(npy.arange(start = Age_Map_Points[:, 0].min() - 1, stop = Age_Map_Points[:, 0].max() + 1, step = 0.01),
+                     npy.arange(start = Age_Map_Points[:, 1].min() - 1, stop = Age_Map_Points[:, 1].max() + 1, step = 0.01))
+plotter.contourf(X1, X2, modelClassifier.predict(npy.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape),
+             alpha = 0.75, cmap = ListedColormap(('red', 'green')))
+plotter.xlim(X1.min(), X1.max())
+plotter.ylim(X2.min(), X2.max())
+for i, j in enumerate(npy.unique(y_set)):
+    plotter.scatter(Age_Map_Points[y_set == j, 0], Age_Map_Points[y_set == j, 1],
+                c = ListedColormap(('red', 'green'))(i), label = j)
+plotter.title('Logistic Regression (Test set)')
+plotter.xlabel('Age')
+plotter.ylabel('Educational Level')
+plotter.legend()
+plotter.show()
