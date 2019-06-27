@@ -1,0 +1,71 @@
+#Libraries that are needed for the analysis
+import numpy as npy
+import pandas as pan
+import matplotlib.pyplot as plotter
+
+#Main Dataset Was Splitted as New Dataset Consisting Only Country,Age,Gender,Income Level And Economic Level 
+data=pan.read_csv('Data_Preprocessed.csv')
+#Dataframe X Containg only the Independent Variable(Predictors)
+X=data.iloc[:,:-1].values
+#Dateframe Y Containing only the Dependent Varaible Has Done Online Banking Or Not
+Y=data.iloc[:,6].values
+
+#We are Encoding the Varaible Country,Gender,Income Level And Economic Level To Values 0,1(Gender Yes or No) or 0,1,2,3(Economy Level)
+from sklearn.preprocessing import LabelEncoder,OneHotEncoder
+label_Encoding_variable_1=LabelEncoder()
+X[:,0]=label_Encoding_variable_1.fit_transform(X[:,0])
+label_Encoding_variable_2=LabelEncoder()
+X[:,1]=label_Encoding_variable_2.fit_transform(X[:,1])
+label_encoder_3=LabelEncoder()
+X[:,3]=label_encoder_3.fit_transform(X[:,3])
+label_encoder_4=LabelEncoder()
+X[:,4]=label_encoder_4.fit_transform(X[:,4])
+label_encoder_5=LabelEncoder()
+X[:,5]=label_encoder_5.fit_transform(X[:,5])
+
+#Encoding the Dependent Varible to Values 0 and 1 (From Yes or No)
+label_encoder_online=LabelEncoder()
+Y=label_encoder_online.fit_transform(Y)
+
+#Step to Convert Encoding of Country Since Argentina is not greater than Singapore we encode it 0 0 0 1 and 0 1 0 0 ,where 1 denotes the specific country.
+onehotencoder=OneHotEncoder(categorical_features=[0])
+X=onehotencoder.fit_transform(X).toarray()
+from sklearn.model_selection import train_test_split
+X_Training_Set,X_Test_Set,Y_Training_Set,Y_Test_Set_Set = train_test_split(X,Y,test_size=0.2,random_state=0)
+
+
+#Feature Scaling To Create A Model Where All The Variable Have A Common Scaling
+from sklearn.preprocessing import StandardScaler
+sc_x= StandardScaler()
+X_Training_Set =sc_x.fit_transform(X_Training_Set)
+X_Test_Set =sc_x.transform(X_Test_Set)
+#Building the Linear Model With Training Data
+from sklearn.linear_model import LinearRegression
+MLPRegressor = LinearRegression()
+MLPRegressor.fit(X_Training_Set, Y_Training_Set)
+
+# Predicting the Test set results
+OnlinePredictor = MLPRegressor.predict(X_Test_Set)
+
+
+
+
+#Multiple Linear Regression:
+#Steps for Backward Elimination Technique of Varible Selection
+import statsmodels.formula.api as sm
+def backwardElimination(x, sl):
+    numberOfVariables = len(x[0])
+    for i in range(0, numberOfVariables):
+	#fitting the model with all varible and a loop to omit a variable based on the SL value set by 0.05
+        MLPRegressor_OLS = sm.OLS(Y, x).fit()
+        maxVar = max(MLPRegressor_OLS.pvalues).astype(float)
+        if maxVar > sl:
+            for j in range(0, numberOfVariables - i):
+                if (MLPRegressor_OLS.pvalues[j].astype(float) == maxVar):
+                    x = npy.delete(x, j, 1)
+    print(MLPRegressor_OLS.summary())
+    return x
+ 
+SLValue = 0.05
+X_optimum = X[:, [0, 1, 2, 3, 4, 5]]
+X_Modeled = backwardElimination(X_optimum, SLValue)
