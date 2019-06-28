@@ -1,0 +1,9 @@
+col.names <- c('Country',
+  'Gender',
+  'Age',
+  'Education',
+  'Income')
+data <- read.csv('Data_Preprocessed_Rest.csv',col.names=col.names,header=FALSE)
+library(rpart)
+prediction.model <- rpart(datainput$V6 ~ datainput$V1+datainput$V2+datainput$V3+datainput$V4+datainput$V5,data=datainput,method='class')
+save(predicition.model, file='prediction_model.RData')

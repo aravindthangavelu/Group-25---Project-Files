@@ -1,0 +1,19 @@
+library(rpart)
+library(jsonlite)
+load("prediction_model.RData")
+ 
+#* @post /predict
+predict.default.rate <- function(
+  
+) {
+  data <- list(
+    Status.of.existing.checking.account=Status.of.existing.checking.account
+    , Duration.in.month=Duration.in.month
+    , Credit.history=Credit.history
+    , Savings.account.bonds=Savings.account.bonds
+  )
+  prediction <- predict(prediction_model, data)
+  probabilityValue <-unbox(prediction[1, 2])
+   Probablity<- ifelse(default.probability>0.5,'Yes','No')
+  return(list(Probablity))
+}
